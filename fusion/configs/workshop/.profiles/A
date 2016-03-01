@@ -1,0 +1,4 @@
+home=/A
+enabled=yes
+allow-paths=no
+allow-modify-messages=yes

@@ -1,0 +1,9 @@
+home=/lunch
+enabled=yes
+allow-paths=no
+allow-modify-messages=yes
+
+#new stuff
+allow-send-echo=yes
+allow-send-stop=yes
+allow-send-terminate=yes

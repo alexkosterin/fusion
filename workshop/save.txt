@@ -1,0 +1,64 @@
+import random, mb
+
+c = mb.Client('test1')
+c.reg('demo')
+
+ms = {}
+i, N = 0, 2000000000
+
+while i < N:
+    i += 1
+    n = random.randint(1, 60000-1)
+    try:
+        if ms.has_key(n) and ms[n]:
+            c.mclose(ms[n])
+            ms[n] = None
+        else:
+            ms[n] = c.mopen("m%0.5d" % n, 'r')
+    except Exception as e:
+        print e, n, ms[n]
+    if i % 1000 == 0:
+        print '.',
+===
+import mb
+
+c = mb.Client('test')
+c.reg('demo')
+m=c.mopen('pong', 'w')
+
+while True:
+	c.pub(m, random.randint(0, 1000000))
+	time.sleep(1)
+===
+import mb
+import struct
+
+c = mb.Client('req')
+c.reg('demo')
+m = c.mopen('ping', 'rw')
+
+XXX=2
+
+for i in xrange(1,1000000):
+	m1, j = c.request(m, XXX, i)
+	(o, ) = struct.unpack("i", j)
+	if i % 1000 == 0: print '.',
+===
+import mb
+
+c = mb.Client('rep')
+c.reg('demo')
+m = c.mopen('ping', 'rw')
+
+def rep(m, i):
+	c.reply(m, i**2);
+
+c.sub(m, rep, type=int)
+
+while True:
+	c.dispatch(True, 1000)
+===
+
+
+
+

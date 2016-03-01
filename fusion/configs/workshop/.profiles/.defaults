@@ -1,0 +1,5 @@
+allow-paths=no
+allow-modify-messages=yes
+output-queue-limit=200000
+clock-sync-period=60000
+path=/sys

@@ -1,0 +1,3 @@
+include .defaults
+home=/drilltime
+enabled=yes

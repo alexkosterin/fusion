@@ -1,0 +1,4 @@
+home=/common_rt1s
+enabled=yes
+allow-paths=no
+allow-modify-messages=yes

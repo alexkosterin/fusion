@@ -1,0 +1,218 @@
+/*
+ *  FUSION
+ *  Copyright (c) 2012-2013 Alex Kosterin
+ */
+
+/*
+ This may be used for mcb_t proto buffer format over network.
+ Not used.
+
+message mcb {
+  required  uint32	  mid     = 1;    // message id
+  required  uint32    seq     = 2;    // message sequence number
+  required  uint32    dst     = 3;    // destination client id
+  optional  uint32    src     = 4;    // source client id, optional on mbm side (can be deduced from connection)
+  required  uint64    org     = 5;    // message host origination (creation) time stamp, msecs
+  required  uint64    len     = 6;    // message payload length
+
+  // req/rep
+  optional  uint32    req_seq = 7;    // for replies: original request message sequence number
+  optional  uint32    wait_mid= 8;    // for requests: message id to wait
+}
+*/
+
+option optimize_for = SPEED;
+
+// common //////////////////////////////////////////////////////////////////////
+
+message mcb_reg {
+  required  uint32    ver_maj = 1;
+  required  uint32    ver_min = 2;
+  required  string    name    = 3;
+  repeated  string    profile = 4;
+  optional  bytes     uuid    = 5;
+  optional  string    pswd    = 6;
+}
+
+message mcb_subscribe {
+  required  uint32    mid     = 1;
+  required  uint32    flags   = 2;
+}
+
+message mcb_mreg {
+  required  string    user    = 1;
+  required  uint32    uid     = 2;
+  required  uint32    gid     = 3;
+}
+
+message mcb_mopen_req {
+  required  string    name    = 1;
+  required  uint32    flags   = 2;
+  optional  uint32    type    = 3;
+  optional  uint32    size    = 4;
+	optional  bytes     data    = 5;
+}
+
+message mcb_mopen_rep {
+  required  uint32    mid     = 1;
+  optional  uint32    type    = 2;
+  optional  uint32    size    = 3;
+  optional  bool      already_opened = 4;
+}
+
+message mcb_mlink {
+  required  string    link    = 1;
+  required  string    orig    = 2;
+  required  bool      soft    = 3;
+}
+
+message mcb_munlink {
+  required  string    name    = 1;
+}
+
+message mcb_mmove {
+  required  string    from    = 1;
+  required  string    to      = 2;
+}
+
+message mcb_mlist_req {
+  optional  string    mask    = 1;
+  optional  uint32    flags   = 2;
+  optional  string    profile = 3;
+}
+
+message mcb_mlist_rep {
+  repeated  string    names   = 1;
+}
+
+message mcb_mstat {
+  required  uint32    st_mid  = 1;
+  required  uint32    st_type = 2;
+  required  uint32    st_nlink= 3;
+  required  uint32    st_uid  = 4;
+  required  uint32    st_gid  = 5;
+  required  uint32    st_size = 6;
+  required  uint32    st_atime= 7;
+  required  uint32    st_mtime= 8;
+  required  uint64    st_ctime= 9;
+}
+
+message mcb_mattr_read {
+  required  uint32    mid     = 1;
+  required  string    key     = 2;
+  required  uint32    len     = 3;
+}
+
+message mcb_mattr_write {
+  required  uint32    mid     = 1;
+  required  string    key     = 2;
+  required  string    value   = 3;
+}
+
+message mcb_mattrs_read {
+  required  uint32    mid     = 1;
+  required  uint32    len     = 2;
+}
+
+message mcb_msave {
+  required  uint32    len     = 1;
+  required  string    sep     = 2;
+}
+
+message mcb_mload {
+  required  string    text    = 1;
+  required  string    sep     = 2;
+}
+
+// sysinfo /////////////////////////////////////////////////////////////////////
+
+enum MCB_SYSINFO_FLAGS {
+  SYS_CLIENTS         = 1;
+  SYS_MESSAGES        = 2;
+  SYS_CLIENT_MESSAGES = 4;
+
+  COM_START_TIME      = 8;
+  COM_AVAIL_MCBS      = 16;
+  COM_ALLOCATED_MCBS  = 32;
+  COM_PREALLOC_MCBS   = 64;
+  COM_MAX_ALLOC_MCBS  = 128;
+
+  CLI_NAME            = 256;
+  CLI_UUID            = 512;
+  CLI_ADDRESS         = 1024;
+  CLI_DEFAULT_PROFILE = 2048;
+  CLI_PROFILES        = 4096;
+  CLI_GROUPS          = 8192;
+  CLI_START_TIME      = 16384;
+  CLI_SYNC_PERIOD     = 32768;
+  CLI_CONN_LATENCY    = 65536;
+  CLI_QUEUE_LIMIT     = 131072;
+  CLI_QUEUE_SIZE      = 262144;
+
+  MSG_NAME            = 524288;
+  MSG_PATH            = 1048576;
+  MSG_OFLAG           = 2097152;
+  MSG_SFLAG           = 4194304;
+  MSG_OPEN_NR         = 8388608;
+  MSG_SUBS_NR         = 16777216;
+  MSG_SND_NR          = 33554432;
+  MSG_RCV_NR          = 67108864;
+  MSG_SND_AVG         = 134217728;
+  MSG_RCV_AVG         = 268435456;
+}
+
+message mcb_sysinfo_request {
+  required  int32     flags               = 1;
+  repeated  int32     cids                = 2;
+  repeated  int32     mids                = 3;
+}
+
+message mcb_sysinfo_common {
+  optional  int32     start_time          = 1;
+  optional  int32     avail_mcbs          = 2;
+  optional  int32     allocated_mcbs      = 3;
+  optional  int32     prealloc_mcbs       = 4;
+  optional  int32     max_alloc_mcbs      = 8;
+}
+
+message mcb_sysinfo_client {
+  required  int32     cid                 = 1;
+  optional  string    name                = 2;
+  optional  bytes     uuid                = 3;
+  optional  string    address             = 4;
+  optional  string    default_profile     = 5;
+  repeated  string    profiles            = 6;
+  repeated  string    groups              = 7;
+  optional  int32     start_time          = 8;
+  optional  int32     clock_sync_period   = 9;
+  optional  int32     connection_latency  = 10;
+  optional  int32     output_queue_limit  = 11;
+  optional  int32     output_queue_size   = 12;
+  // statistics - ???
+}
+
+message mcb_sysinfo_message {
+  required  int32     mid                 = 1;
+  optional  int32     cid                 = 2;  // none for all clients
+  optional  string    name                = 3;
+  optional  string    path                = 4;
+  optional  int32     oflags              = 5;
+  optional  int32     sflags              = 6;
+
+  // statistics: per client/per mid(all clients)
+  optional  int32     open_nr             = 7;
+  optional  int32     subs_nr             = 8;
+
+  // statistics: per client/per mid(all clients)
+  optional  int32     snd_nr              = 9;
+  optional  int32     rcv_nr              = 10;
+  optional  int32     avg_snd             = 11;  // averge send rate over last ??? secs
+  optional  int32     avg_rcv             = 12;  // averge recive rate over last ??? secs
+}
+
+message mcb_sysinfo_reply {
+  required  int32               flags     = 1;
+  optional  mcb_sysinfo_common  common    = 2;
+  repeated  mcb_sysinfo_client  clients   = 3;
+  repeated  mcb_sysinfo_message messages  = 4;
+}

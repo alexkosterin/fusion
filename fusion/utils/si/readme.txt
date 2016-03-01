@@ -1,0 +1,1 @@
+example/test for Fusion system info call

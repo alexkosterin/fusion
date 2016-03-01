@@ -1,0 +1,23 @@
+/*
+ *  FUSION
+ *  Copyright (c) 2012-2013 Alex Kosterin
+ */
+
+message tag {
+  required  uint32    index		= 1;
+  required  string    name    = 2;
+  required  uint32    size    = 3;
+  optional  string    format  = 4;
+  optional  uint32    mid			= 5;
+}
+
+message header {
+	repeated  tag				tags		= 1;
+
+  optional  string    comment = 2;	//
+  optional  string    cmdline = 3;	//
+  optional  string    date		= 4;	//
+  optional  string    user		= 5;	//
+  optional  string    host		= 6;	//
+  optional  string    os			= 7;	//
+}
